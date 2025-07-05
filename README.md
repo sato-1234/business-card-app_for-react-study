@@ -39,61 +39,36 @@ npm i styled-components
 
 ログイン機能後のディレクトリ構成（一部省略）
 
+```
 ├── 省略・・・
-
 ├── src/
-
 │ ├── components/
-
 │ │ └── organisms/
-
 │ │ └── Heder.tsx // 共通タイトルとナビメニュー
-
 │ ├── config/
-
 │ │ └── constants.ts // 共通定数（例：サイトのタイトル名等）
-
 │ ├── lib/
-
 │ │ └── supabase.ts // supabase 接続設定
-
 │ ├── modules/
-
 │ │ ├── auth/
-
 │ │ │ └── user.repository.ts // ログイン機能処理
-
 │ ├── pages/
-
 │ │ ├── Home.tsx // ログイン後
-
 │ │ ├── Page404.tsx
-
 │ │ ├── Signin.tsx // ログイン前
-
 │ │ ├── Signout.tsx // ログイン前
-
 │ │ └── Signup.tsx // ログイン後
-
 │ ├── providers/
-
 │ │ └── AuthProvider.tsx // ログイン有無の管理
-
 │ ├── App.tsx
-
 │ ├── index.css
-
 │ ├── main.tsx
-
 │ └── vite-env.d.ts
-
 └── .env // supabase に接続するための環境変数
-
 └── .gitignore // .env 等は push しないようにする
-
 └── database.types.ts // supabase 上のテーブル型定義
-
 └── 省略・・・
+```
 
 ## 3. cards テーブル作成
 
@@ -168,6 +143,7 @@ COMMENT ON COLUMN public.cards.auth_id IS '所有者を示す認証ユーザーI
 ```
 
 **RLS ポリシー（RLS 有効で認証外部キーの設定も有効になる）**
+
 認証ユーザーが自身で作成した名刺情報のみを操作できるように設定しています。
 
 ```sql
@@ -258,6 +234,7 @@ COMMENT ON COLUMN public.skill.name IS 'スキル名（例: React, TypeScript）
 ```
 
 **RLS ポリシー**
+
 認証ユーザーであれば、スキル一覧を閲覧できるように設定しています。
 
 ```sql
@@ -323,6 +300,7 @@ COMMENT ON COLUMN public.card_skill.skill_id IS '関連するスキルのID';
 ```
 
 **RLS ポリシー**
+
 認証ユーザーが自身で作成した情報のみを操作できるように設定しています。
 
 ```sql
