@@ -8,6 +8,8 @@
   --border-color2: #ccc;
   --bg-color: #d9e9e5;
   --bg-color2: #25b09b;
+  --bg-color3: #006eff;
+  --box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
 }
 
 /*  デザイン、文字、サイズ  */
@@ -20,13 +22,14 @@ body {
 }
 #root {
   position: relative;
-  height: 100vh;
 }
 h1,
 h2,
 h3,
 p,
-ul {
+ul,
+dl,
+dd {
   margin: 0;
 }
 button {
@@ -57,26 +60,4 @@ td {
 th[scope="col"],
 th[scope="row"] {
   font-weight: normal;
-}
-
-/* HTML: <div class="loader"></div>
-   https://css-loaders.com/spinner/
-*/
-.loader {
-  width: 150px;
-  padding: 8px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: #25b09b;
-  --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
-  -webkit-mask: var(--_m);
-  mask: var(--_m);
-  -webkit-mask-composite: source-out;
-  mask-composite: subtract;
-  animation: l3 1s infinite linear;
-}
-@keyframes l3 {
-  to {
-    transform: rotate(1turn);
-  }
 }

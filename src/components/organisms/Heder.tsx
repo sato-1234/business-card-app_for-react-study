@@ -57,9 +57,10 @@ const Heder = memo(() => {
       </h1>
       <nav>
         {user ? (
-          <Link to="/signout" className="smarPhone">
-            ログアウト
-          </Link>
+          <>
+            <Link to="/cards">名刺一覧</Link>
+            <Link to="/signout">ログアウト</Link>
+          </>
         ) : (
           <>
             <Link to="/signup">アカウント作成</Link>
