@@ -5,12 +5,16 @@ import { Card } from "../../domain/card";
 import { deleteCard, getCards } from "../../modules/card/cards.repository";
 
 import styled from "styled-components";
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react"; // Pencilは一旦なし
 import Loading from "./atoms/Loading";
 
 const CardListDiv = styled.div`
   > h2 {
     text-align: center;
+  }
+  > p {
+    text-align: center;
+    padding-top: 20px;
   }
   > ul {
     padding: 10px 0;
@@ -54,7 +58,7 @@ const CardList = memo(() => {
 
   const [cardsData, setCardsData] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [zero, setZero] = useState("");
 
   useEffect(() => {
     const fetchCardsData = async () => {
@@ -64,14 +68,14 @@ const CardList = memo(() => {
         const { success, message, data } = await getCards();
 
         if (success == true && data.length == 0) {
-          setError(message);
+          setZero(message);
           return;
         }
 
         setCardsData(data);
-      } catch (error) {
+      } catch (e) {
         // 予期せぬエラー（ネットワーク切断など）
-        console.error("データの取得中に予期せぬエラーが発生しました:", error);
+        console.error("データの取得中に予期せぬエラーが発生しました:", e);
       } finally {
         setLoading(false);
       }
@@ -102,20 +106,24 @@ const CardList = memo(() => {
   return (
     <CardListDiv>
       <h2>作成名刺一覧</h2>
-      <ul>
-        {cardsData?.map((card) => (
-          <li key={card.card_id}>
-            <Link to={`/cards/${card.card_id}`}>{card.card_id}</Link>
-            {/* <Pencil className="pencil" data-testid="edit-card" /> */}
-            <Trash2
-              className="pencil"
-              data-testid="delete-card"
-              onClick={() => deleteSelectCard(card.card_id)}
-            />
-            <time dateTime="">作成日:2025-01-01</time>
-          </li>
-        ))}
-      </ul>
+      {cardsData.length > 0 ? (
+        <ul>
+          {cardsData?.map((card) => (
+            <li key={card.card_id}>
+              <Link to={`/cards/${card.card_id}`}>{card.card_id}</Link>
+              {/* <Pencil className="pencil" data-testid="edit-card" /> */}
+              <Trash2
+                className="pencil"
+                data-testid="delete-card"
+                onClick={() => deleteSelectCard(card.card_id)}
+              />
+              <time dateTime="">作成日:2025-01-01</time>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>{zero}</p>
+      )}
       <div className="addLink">
         新規名刺登録は<Link to="/cards/register">こちら</Link>
       </div>

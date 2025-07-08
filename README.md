@@ -6,7 +6,7 @@ https://qiita.com/Sicut_study/items/7d8c6f309dddda1a3961
 の課題４ の内容にそって、アウトプットしました。そのため不要なコメントも残しています。
 
 **デプロイ先**
-https://XXXX
+https://business-card-app-995b2.web.app/
 
 **2025/06/30 　～　 07/06：課題４ 実装中**
 
@@ -500,6 +500,25 @@ afterEach(() => {
 ```
 
 ## 9. Fireabse にデプロイ後、Github Actions(Push)で CI/CD 設定
+
+```
+// Fireabseプロジェクト作成し、WEEアプリにFireabse追加後
+npm install firebase
+npm install -g firebase-tools
+firebase login
+firebase init
+> Are you ready to proceed? y
+> Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys を選択（space → Enter）
+> Please select an option: Use an existing project(既存のプロジェクト選択)
+> What do you want to use as your public directory? dist
+> Configure as a single-page app (rewrite all urls to /index.html)? y
+Set up automatic builds and deploys with GitHub? n
+
+// distフォルダにビルド
+npm run build
+// firebase デプロイ
+firebase deploy
+```
 
 ## 使用技術
 

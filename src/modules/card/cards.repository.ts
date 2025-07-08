@@ -44,10 +44,10 @@ export async function getCards() {
   }
 
   // 2. 「0件エラー」
-  if (!data) {
+  if (!data || data.length == 0) {
     return {
       success: true,
-      message: "名刺がはまだ登録されていません。",
+      message: "名刺がまだ登録されていません。",
       data: [],
     };
   }

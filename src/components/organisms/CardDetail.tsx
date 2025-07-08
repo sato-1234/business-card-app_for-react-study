@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
 
 import type { Card } from "../../domain/card";
