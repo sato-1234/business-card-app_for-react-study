@@ -8,8 +8,6 @@ https://qiita.com/Sicut_study/items/7d8c6f309dddda1a3961
 **デプロイ先**
 https://business-card-app-995b2.web.app/
 
-**2025/06/30 　～　 07/06：課題４ 実装中**
-
 ## 1. vite で環境構築（React、TypeScript を選択）
 
 ```
@@ -150,7 +148,7 @@ CREATE TABLE public.cards (
 
 -- (オプション) テーブルとカラムにコメントを追加して、後から分かりやすくする
 COMMENT ON TABLE public.cards IS 'ユーザーが作成する名刺情報';
-COMMENT ON COLUMN public.cards.card_id IS 'ユーザーが設定するユニークな名刺ID';
+COMMENT ON COLUMN public.cards.card_id IS 'ユーザーが設定する名刺ID';
 COMMENT ON COLUMN public.cards.auth_id IS '所有者を示す認証ユーザーID';
 ```
 
@@ -321,7 +319,7 @@ alter policy "Enable users to view their own data only"
 on "public"."card_skill"
 to authenticated
 using (
-    (( SELECT auth.uid() AS uid) = auth_id) -- 修正
+    (( SELECT auth.uid() AS uid) = auth_id)
 );
 
 -- INSERT：認証ユーザーのみ挿入を有効にする(自身の認証IDを挿入する)
@@ -329,7 +327,7 @@ alter policy "Enable insert for authenticated users only"
 on "public"."card_skill"
 to authenticated
 with check (
-    (( SELECT auth.uid() AS uid) = auth_id) -- 修正
+    (( SELECT auth.uid() AS uid) = auth_id)
 );
 
 -- UPDATE：認証ユーザーが自分のデータのみを更新できるようにする
@@ -337,10 +335,10 @@ alter policy "Enable users to update their own data only"
 on "public"."card_skill"
 to authenticated
 using (
-    (( SELECT auth.uid() AS uid) = auth_id) -- 修正
+    (( SELECT auth.uid() AS uid) = auth_id)
 )
 with check (
-    (( SELECT auth.uid() AS uid) = auth_id) -- 修正
+    (( SELECT auth.uid() AS uid) = auth_id)
 );
 
 -- DELETE：認証ユーザーが自分のデータのみを削除できるようにする
@@ -348,7 +346,7 @@ alter policy "Enable delete for users based on user_id"
 on "public"."card_skill"
 to authenticated
 using (
-    (( SELECT auth.uid() AS uid) = auth_id) -- 修正
+    (( SELECT auth.uid() AS uid) = auth_id)
 );
 ```
 
@@ -436,7 +434,8 @@ npm i --save-dev @types/dompurify
 ```
 
 新規登録で cards テーブル更新後、card_skill テーブル更新する処理は RPC 関数「create_card_with_skill」を使用
-削除は cards テーブルレコード削除後、制約により関連する card_skill テーブルのレコードは自動で削除される
+
+削除は cards テーブルレコード削除後、制約で関連する card_skill テーブルのレコードは自動で削除される
 
 ## 10. 自動テスト処理、GITHUB ACTION 連携
 
@@ -496,6 +495,7 @@ export default defineConfig({
 ```
 
 vitest.setup.ts を新規作成。
+
 テストでのグローバル（共通）設定。
 
 ```ts
@@ -511,7 +511,7 @@ afterEach(() => {
 });
 ```
 
-テストフォルダ「**tests**」にテストファイル作成し、テストコード実装完了後、「.github/workflows」を作成
+テストフォルダ「\_\_tests\_\_」にテストファイル作成し、テストコード実装完了後、「.github/workflows」を作成
 
 ```yml
 # .github/workflows/test.yml にpush後自動テスト設定
@@ -552,9 +552,10 @@ jobs:
 ## 11. Fireabse にデプロイ後、Github Actions(Push)で CI/CD 設定
 
 ```
-// Fireabseプロジェクト作成し、WEEアプリにFireabse追加
+// Fireabseプロジェクト作成し、WEBアプリにFireabse追加
 npm install firebase
 npm install -g firebase-tools
+
 firebase login
 firebase init
 ? Are you ready to proceed? y
@@ -566,6 +567,7 @@ firebase init
 
 // distフォルダにビルド
 npm run build
+
 // firebase デプロイ
 firebase deploy
 
@@ -665,6 +667,8 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BUSINESS_CARD_APP_995B2 }}
           projectId: business-card-app-995b2
 ```
+
+---
 
 ## 使用技術
 
