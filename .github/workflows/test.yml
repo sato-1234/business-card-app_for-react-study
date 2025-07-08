@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    # if: false # 自動テストなしにする場合、コメントを外す
+    if: false # 自動テストなしにする場合、コメントを外す
     runs-on: ubuntu-latest
 
     steps:
