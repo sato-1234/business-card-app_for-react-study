@@ -1,5 +1,5 @@
 import { supabase } from "../../lib/supabase";
-// import { User } from "../../domain/users";
+import { Card, Skill } from "../../domain/card";
 
 /* cardsテーブル　Supabaseのロールの設定
   SELECT : ログイン(認証)後、自分で作成したレコードのみ参照可能
@@ -22,8 +22,10 @@ import { supabase } from "../../lib/supabase";
   DELETE : ログイン(認証)後、自分で作成したレコードのみ削除可能
 */
 
-// 型をUser型で返す。非同期のため返値Promise<User[]>
+// 型をCard型で返す。非同期のため返値Promise<Card[]>
 export async function getCards() {
+  // Supabaseは cardsテーブルと skill テーブルの間に card_skillという中間テーブルがあることを、データベースに設定されたForeign Key制約から自動的に推測し、内部でJOIN処理を行う。
+  // もしリレーションが起動しない場合、skill: card_skill (skill (skill_id,name))と明示的に指定すること
   const { data, error } = await supabase.from("cards").select(
     `
         card_id,
@@ -35,19 +37,37 @@ export async function getCards() {
         skills: skill (skill_id,name)
       `
   );
+
+  if (error && error.code !== "PGRST116") {
+    // console.error("予期せぬデータベースエラー:", error);
+    throw new Error(error?.message);
+  }
+
   // 2. 「0件エラー」
   if (!data) {
     return {
       success: true,
       message: "名刺がはまだ登録されていません。",
-      data: null,
+      data: [],
     };
   }
 
+  const res = data.map((card) => {
+    return new Card(
+      card.card_id,
+      card.name,
+      card.description,
+      card.github_id,
+      card.qiita_id,
+      card.x_id,
+      card.skills
+    );
+  });
+
   return {
     success: true,
-    message: null,
-    data,
+    message: "",
+    data: res,
   };
 }
 
@@ -57,13 +77,14 @@ export async function getSkills() {
     // console.error("予期せぬデータベースエラー:", error);
     throw new Error(error?.message);
   }
-  return data;
+  const res = data.map((skill) => {
+    return new Skill(skill.skill_id, skill.name);
+  });
+
+  return res;
 }
 
 export async function findCard(cardId: string) {
-  // Supabaseは cardsテーブルと skill テーブルの間に card_skillという中間テーブルがあることを、データベースに設定されたForeign Key制約から自動的に推測し、内部でJOIN処理を行う。
-  // もしリレーションが起動しない場合、skill: card_skill (skill (skill_id,name))と明示的に指定すること
-
   // ①cardsテーブルからcardIdに一致する一件のユーザーレコードを取得
   // ②card_skillテーブルの中から、card_idであるレコードをすべて探す(そのためskillsは配列になる)
   const { data, error } = await supabase
@@ -83,18 +104,13 @@ export async function findCard(cardId: string) {
     .single();
 
   // エラーが存在し、かつそれが「0件エラー」ではない場合
-  // (ネットワークエラーやサーバーダウンなど、本当に予期せぬエラー)
+  // ネットワークエラーやサーバーダウンなど、本当に予期せぬエラー
   if (error && error.code !== "PGRST116") {
-    console.error("予期せぬデータベースエラー:", error);
-    return {
-      success: false,
-      message: error?.message ?? "予期せぬデータベースエラー",
-      data: null,
-    };
+    // console.error("Supabase Error:", message);
+    throw new Error(error?.message);
   }
 
-  // 2. 「0件エラー」
-  // data が null なら「見つからなかった」
+  // 0件エラー。data が null なら見つからなかった
   if (!data) {
     return {
       success: true,
@@ -105,8 +121,16 @@ export async function findCard(cardId: string) {
 
   return {
     success: true,
-    message: null,
-    data,
+    message: "",
+    data: new Card(
+      data.card_id,
+      data.name,
+      data.description,
+      data.github_id,
+      data.qiita_id,
+      data.x_id,
+      data.skills
+    ),
   };
 }
 
@@ -134,8 +158,18 @@ type FormData = {
 //   return true;
 // }
 export async function createUserWithSkill(req: FormData) {
+  // DB側の制約対策。""とnullは異なるため
+  // 制約で正規表現を使用しているため、""の場合エラーになる
+  const params = {
+    ...req,
+    // もし空文字なら null に、そうでなければ元の値のままにする
+    github_id: req.github_id === "" ? null : req.github_id,
+    qiita_id: req.qiita_id === "" ? null : req.qiita_id,
+    x_id: req.x_id === "" ? null : req.x_id,
+  };
+
   const { data, error } = await supabase.rpc("create_card_with_skill", {
-    params: req,
+    params, // params: params の意味
   });
 
   if (error != null) {
@@ -148,7 +182,7 @@ export async function createUserWithSkill(req: FormData) {
   if (data) {
     return {
       success: data,
-      message: null,
+      message: "",
     };
   } else {
     return {
@@ -158,7 +192,22 @@ export async function createUserWithSkill(req: FormData) {
   }
 }
 
-export async function editCard() {}
+// cardsテーブルのレコード削除すると、関連テーブルのレコードは制約で自動削除
+export async function deleteCard(card_id: string) {
+  // 制約があるため中間テーブルの削除処理不要
+  const { data, error } = await supabase
+    .from("cards")
+    .delete()
+    .eq("card_id", card_id)
+    .select()
+    .single();
+  // ポリシーで設定しているため以下は不要
+  // .eq('auth_id', (await supabase.auth.getSession()).data.session.user.id); // 所有者チェック
 
-// テーブルが空になると、IDのAutoIncrementはリセットされない
-export async function deleteCard() {}
+  if (error != null) throw new Error(error.message);
+  if (!data) throw new Error("削除されたデータが見つかりません");
+
+  return data.card_id;
+}
+
+export async function editCard() {}

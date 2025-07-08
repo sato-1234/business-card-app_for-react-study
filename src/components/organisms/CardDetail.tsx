@@ -91,12 +91,6 @@ const CardDetail = memo(() => {
 
         const { success, message, data } = await findCard(id);
 
-        if (success == false && data == null) {
-          console.error("Supabase Error:", message);
-          navigate("/", { replace: true });
-          return;
-        }
-
         if (success == true && data == null) {
           setError(message);
           return;
@@ -104,7 +98,7 @@ const CardDetail = memo(() => {
 
         setCardData(data);
       } catch (error) {
-        // さらに予期せぬエラー（ネットワーク切断など）
+        // 予期せぬエラー（ネットワーク切断など）
         console.error("データの取得中に予期せぬエラーが発生しました:", error);
         navigate("/", { replace: true });
       } finally {
@@ -123,9 +117,16 @@ const CardDetail = memo(() => {
     return (
       <CardDetailDiv>
         <p>{error}</p>
-        <Link to="/" className="back">
+        {/* <Link to="/" className="back" data-testid="back">
           戻る
-        </Link>
+        </Link> */}
+        <button
+          className="back"
+          data-testid="back"
+          onClick={() => navigate("/", { replace: true })}
+        >
+          ホームに戻る
+        </button>
       </CardDetailDiv>
     );
   }
@@ -138,50 +139,71 @@ const CardDetail = memo(() => {
   return (
     <CardDetailDiv>
       <div className="card">
-        <h2>{cardData.name}</h2>
+        <h2 data-testid="card-name">{cardData.name}</h2>
         <dl>
           <dt>自己紹介</dt>
-          <dd dangerouslySetInnerHTML={{ __html: cleanHtml }} />
+          <dd
+            data-testid="description"
+            dangerouslySetInnerHTML={{ __html: cleanHtml }}
+          />
           <dt>好きな技術</dt>
           <dd>
             {cardData.skills?.map((skill, index) => (
-              <span key={index}>{skill.name}</span>
+              <span data-testid="skill" key={index}>
+                {skill.name}
+              </span>
             ))}
           </dd>
         </dl>
-        <ul>
-          <li>
-            <a
-              href={`https://github.com/${cardData.github_id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SiGithub />
-            </a>
-          </li>
-          <li>
-            <a
-              href={`https://qiita.com/${cardData.qiita_id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img src="/icons/qiita.png" alt="qiita" />
-            </a>
-          </li>
-          <li>
-            <a
-              href={`https://twitter.com/${cardData.x_id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SiX />
-            </a>
-          </li>
-        </ul>
+        {(cardData.github_id || cardData.qiita_id || cardData.x_id) && (
+          <ul>
+            {cardData.github_id && (
+              <li>
+                <a
+                  href={`https://github.com/${cardData.github_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <SiGithub data-testid="github-id" />
+                </a>
+              </li>
+            )}
+            {cardData.qiita_id && (
+              <li>
+                <a
+                  href={`https://qiita.com/${cardData.qiita_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="/icons/qiita.png"
+                    alt="qiita"
+                    data-testid="qiita-id"
+                  />
+                </a>
+              </li>
+            )}
+            {cardData.x_id && (
+              <li>
+                <a
+                  href={`https://twitter.com/${cardData.x_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <SiX data-testid="x-id" />
+                </a>
+              </li>
+            )}
+          </ul>
+        )}
       </div>
-      <Link to="/" className="back">
+      <button
+        className="back"
+        data-testid="back"
+        onClick={() => navigate("/", { replace: true })}
+      >
         ホームに戻る
-      </Link>
+      </button>
     </CardDetailDiv>
   );
 });

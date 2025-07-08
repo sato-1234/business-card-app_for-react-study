@@ -103,7 +103,7 @@ const CardRegister = memo(() => {
 
   return (
     <CardRegisterDiv>
-      <h2>新規名刺登録</h2>
+      <h2 data-testid="registration-title">新規名刺登録</h2>
       <form onSubmit={handleSubmit(onSubmit)} data-testid="registration-form">
         <label>
           <p>好きな英単語（半角英数字と「-」「_」）*</p>
@@ -128,7 +128,9 @@ const CardRegister = memo(() => {
             placeholder="名刺IDを入力"
           />
           {formState.errors.card_id && (
-            <p className="error">{formState.errors.card_id.message}</p>
+            <p className="error" data-testid="error-card-id">
+              {formState.errors.card_id.message}
+            </p>
           )}
         </label>
         <label>
@@ -144,7 +146,9 @@ const CardRegister = memo(() => {
             })}
           />
           {formState.errors.name && (
-            <p className="error">{formState.errors.name.message}</p>
+            <p className="error" data-testid="error-name">
+              {formState.errors.name.message}
+            </p>
           )}
         </label>
         <label>
@@ -160,7 +164,9 @@ const CardRegister = memo(() => {
             placeholder="<h1>タグも使用できます"
           />
           {formState.errors.description && (
-            <p className="error">{formState.errors.description.message}</p>
+            <p className="error" data-testid="error-description">
+              {formState.errors.description.message}
+            </p>
           )}
         </label>
         <label>
@@ -192,7 +198,6 @@ const CardRegister = memo(() => {
           <input
             type="text"
             {...register("github_id", {
-              required: "GITHUB_IDは必須です",
               maxLength: {
                 value: 39,
                 message: "39文字以内で入力してください",
@@ -213,7 +218,6 @@ const CardRegister = memo(() => {
           <input
             type="text"
             {...register("qiita_id", {
-              required: "Qiita_IDは必須です",
               maxLength: {
                 value: 39,
                 message: "39文字以内で入力してください",
@@ -234,7 +238,6 @@ const CardRegister = memo(() => {
           <input
             type="text"
             {...register("x_id", {
-              required: "X_IDは必須です",
               minLength: {
                 value: 4,
                 message: "4文字以上で入力してください",
@@ -255,7 +258,7 @@ const CardRegister = memo(() => {
           )}
         </label>
         <div className="button">
-          <button>登録</button>
+          <button data-testid="register">登録</button>
         </div>
       </form>
     </CardRegisterDiv>

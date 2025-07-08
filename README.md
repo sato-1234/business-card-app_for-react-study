@@ -412,7 +412,7 @@ npx supabase gen types --lang=typescript --project-id "project-idを入力" --sc
 
 ## 6. 名刺 ID 入力後　 → 　名刺表示処理
 
-## 7. 新規登録処理
+## 7. 新規登録、削除処理
 
 実装に必要なパッケージインストール
 
@@ -424,10 +424,82 @@ npm i --save-dev @types/dompurify
 ```
 
 新規登録で cards テーブル更新後、card_skill テーブル更新する処理は RPC 関数「create_card_with_skill」を使用
+削除は cards テーブルレコード削除後、制約により関連する card_skill テーブルのレコードは自動で削除される
 
-## 8. 自動テスト処理　：　 7/5 実装中
+## 8. 自動テスト処理、GITHUB ACTION 連携
 
-途中
+テスト用パッケージインストール
+
+```
+npm i -D vitest @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event jsdom
+```
+
+package.json 一部編集
+
+```json
+{
+  // 省略　・・・
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "vitest" //追加
+  }
+  // 省略　・・・
+}
+```
+
+tsconfig.app.json 一部編集
+
+```json
+{
+  "compilerOptions": {
+    // 省略　・・・
+
+    /* vitest用 */
+    "types": ["vitest/globals"]
+  },
+  "include": ["src", "vitest.setup.ts"]
+}
+```
+
+vite.config.ts 一部編集
+
+```ts
+// 'vite' → 'vitest/config'に変更。「test:」の型が使用できないため
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    // 追加
+    environment: "jsdom", // 仮想DOM環境でテスト（ブラウザのような環境）
+    globals: true, // describe / it / expect をグローバルに使える
+    setupFiles: ["./vitest.setup.ts"], // クリーン用、配列にすること！
+  },
+});
+```
+
+vitest.setup.ts を新規作成。
+テストでのグローバル（共通）設定。
+
+```ts
+// import { afterEach } from 'vitest';
+import { cleanup } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
+
+export const user = userEvent.setup();
+
+afterEach(() => {
+  cleanup();
+});
+```
+
+## 9. Fireabse にデプロイ後、Github Actions(Push)で CI/CD 設定
 
 ## 使用技術
 

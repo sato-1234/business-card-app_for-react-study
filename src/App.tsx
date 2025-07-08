@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { AuthProvider } from "./providers/AuthProvider";
 import { COPYRIGHT } from "./config/constants";
 
-import Layout from "./pages/layout";
+import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Page404 from "./pages/Page404";
 import Signin from "./pages/Signin";

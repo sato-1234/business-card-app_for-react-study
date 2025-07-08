@@ -67,26 +67,34 @@ const Home = memo(() => {
       navigate(`/cards/${id}`, { replace: true });
       return;
     } else {
-      setError("IDの形式が正しくありません。");
+      setError("IDの形式が正しくありません");
     }
   };
 
   return (
     <>
       <HomeDiv>
-        <h2>デジタル名刺</h2>
+        <h2 data-testid="home-title">デジタル名刺</h2>
         <form onSubmit={handleSubmit}>
           <p>名刺ID入力</p>
           <input
             type="text"
             value={id}
             onChange={(e) => setId(e.target.value)}
+            data-testid="input-card-id"
           />
-          {error && <p className="error">{error}</p>}
-          <button>名刺を見る</button>
+          {error && (
+            <p className="error" data-testid="error">
+              {error}
+            </p>
+          )}
+          <button data-testid="view-button">名刺を見る</button>
         </form>
         <div className="addLink">
-          新規名刺登録は<Link to="/cards/register">こちら</Link>
+          新規名刺登録は
+          <Link to="/cards/register" data-testid="register">
+            こちら
+          </Link>
         </div>
       </HomeDiv>
       <InfoText>

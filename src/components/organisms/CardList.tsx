@@ -1,8 +1,8 @@
 import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import type { Card } from "../../domain/card";
-import { getCards } from "../../modules/card/cards.repository";
+import { Card } from "../../domain/card";
+import { deleteCard, getCards } from "../../modules/card/cards.repository";
 
 import styled from "styled-components";
 import { Pencil, Trash2 } from "lucide-react";
@@ -52,7 +52,7 @@ const CardListDiv = styled.div`
 const CardList = memo(() => {
   console.log("CardsList");
 
-  const [cardsData, setCardsData] = useState<Card[] | null>(null);
+  const [cardsData, setCardsData] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -63,7 +63,7 @@ const CardList = memo(() => {
 
         const { success, message, data } = await getCards();
 
-        if (success == true && data == null) {
+        if (success == true && data.length == 0) {
           setError(message);
           return;
         }
@@ -80,6 +80,21 @@ const CardList = memo(() => {
     fetchCardsData();
   }, []);
 
+  const deleteSelectCard = async (card_id: string) => {
+    const result = confirm("本当に削除しますか？");
+    if (result) {
+      try {
+        const deleteId = await deleteCard(card_id);
+        //一致しないIDすべて
+        //setCardsData(list.filter((v) => v.id !== res.id));
+        setCardsData((prev) => prev.filter((v) => v.card_id !== deleteId));
+      } catch (err) {
+        console.error(err);
+        alert("削除に失敗しました。");
+      }
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -90,9 +105,13 @@ const CardList = memo(() => {
       <ul>
         {cardsData?.map((card) => (
           <li key={card.card_id}>
-            <Link to={`/cards/${card.card_id}`}>{card.name}</Link>
+            <Link to={`/cards/${card.card_id}`}>{card.card_id}</Link>
             {/* <Pencil className="pencil" data-testid="edit-card" /> */}
-            <Trash2 className="pencil" data-testid="delete-card" />
+            <Trash2
+              className="pencil"
+              data-testid="delete-card"
+              onClick={() => deleteSelectCard(card.card_id)}
+            />
             <time dateTime="">作成日:2025-01-01</time>
           </li>
         ))}
