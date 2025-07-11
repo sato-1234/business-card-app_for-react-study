@@ -270,11 +270,13 @@ INSERT INTO skill (name) VALUES
 
 ## 6. card_skill 中間テーブル作成
 
-| column_name | data_type | null     | other                          |
-| ----------- | --------- | -------- | ------------------------------ |
-| auth_id     | uuid      | not-null | PK, FK (auth.users.id)         |
-| card_id     | varchar   | not-null | PK, FK (public.cards.card_id)  |
-| skill_id    | int8      | not-null | PK, FK (public.skill.skill_id) |
+※PKFK は複合外部キーの略
+
+| column_name | data_type | null     | other                                           |
+| ----------- | --------- | -------- | ----------------------------------------------- |
+| auth_id     | uuid      | not-null | PK,FK(auth.users.id),PKFK(public.cards.auth_id) |
+| card_id     | varchar   | not-null | PK,PKFK(public.cards.card_id)                   |
+| skill_id    | int8      | not-null | PK,FK(public.skill.skill_id)                    |
 
 ```sql
 CREATE TABLE public.card_skill (
@@ -292,9 +294,9 @@ CREATE TABLE public.card_skill (
   -- ON DELETE CASCADE: 認証ユーザーが削除されたら、この中間テーブルの関連行も自動削除
   CONSTRAINT card_skill_auth_id_fkey FOREIGN KEY (auth_id) REFERENCES auth.users (id) ON DELETE CASCADE,
 
-  -- card_id を cards テーブルの card_id カラムにリンクさせる外部キー制約
+  -- card_id,auth_id を cards テーブルの card_id,auth_id カラムにリンクさせる外部キー制約
   -- ON DELETE CASCADE: cardsテーブルの行が削除されたら、この中間テーブルの関連行も自動削除
-  -- 注意: この外部キーは、cardsテーブルの(card_id, auth_id)という複合主キー全体を参照しています
+  -- この外部キーは、cardsテーブルの(card_id, auth_id)という複合主キーを参照しています
   CONSTRAINT card_skill_card_id_fkey FOREIGN KEY (card_id, auth_id) REFERENCES public.cards (card_id, auth_id) ON DELETE CASCADE,
 
   -- skill_id を skill テーブルの skill_id カラムにリンクさせる外部キー制約
